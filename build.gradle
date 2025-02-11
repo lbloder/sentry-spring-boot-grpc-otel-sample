@@ -59,7 +59,7 @@ tasks.register('runWithAgent', JavaExec){
     environment("OTEL_METRICS_EXPORTER", "console")
     environment("OTEL_LOGS_EXPORTER", "console")
 
-    def otelDebug = System.getenv("OTEL_DEBUG") ?: "true"
+    def otelDebug = System.getenv("OTEL_DEBUG") ?: "false"
 
     jvmArgs = ["-Dotel.javaagent.debug=${otelDebug}", "-javaagent:${agentJarPath}".toString()]
 }
