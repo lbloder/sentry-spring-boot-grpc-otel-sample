@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.sentry.samples.spring.boot.grpc";
+option java_outer_classname = "TodoProto";
+package sentry.sample.todo;
+
+// The greeting service definition.
+service Todo {
+  // Sends a greeting
+  rpc GetTodo (TodoRequest) returns (TodoReply) {}
+}
+
+// The request message containing the user's name.
+message TodoRequest {
+   int32 id = 1;
+}
+
+// The response message containing the greetings
+message TodoReply {
+  int32 userId = 1;
+  int32 id = 2;
+  string title = 3;
+  string completed = 4;
+}

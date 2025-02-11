@@ -1,0 +1,86 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.2'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+group = 'io.sentry.sample.spring.boot.grpc'
+version = '0.4.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.grpc:spring-grpc-dependencies:0.3.0'
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+    implementation 'io.grpc:grpc-services'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("io.sentry:sentry:8.1.0")
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.grpc:spring-grpc-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly "io.netty:netty-transport-native-epoll::linux-x86_64"
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.register('runWithAgent', JavaExec){
+    group = "application"
+
+    def mainBootRunTask = tasks.named("bootRun", JavaExec).get()
+    mainClass = mainBootRunTask.mainClass
+    classpath = mainBootRunTask.classpath
+
+    def agentJarPath = "sentry-opentelemetry-agent-8.1.0.jar"
+
+    def dsn = System.getenv("SENTRY_DSN") ?: "https://c75dccdece8c4f2b8ca8eea97269cdbd@o447951.ingest.us.sentry.io/4505289086795776"
+
+    def tracesSampleRate = System.getenv("SENTRY_TRACES_SAMPLE_RATE") ?: "1"
+
+    environment("SENTRY_DSN", dsn)
+    environment("SENTRY_TRACES_SAMPLE_RATE", tracesSampleRate)
+    environment("SENTRY_DEBUG", "true")
+    environment("OTEL_TRACES_EXPORTER", "none")
+    environment("OTEL_METRICS_EXPORTER", "none")
+    environment("OTEL_LOGS_EXPORTER", "none")
+
+    jvmArgs = ["-Dotel.javaagent.debug=true", "-javaagent:${agentJarPath}".toString()]
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${dependencyManagement.importedProperties['protobuf-java.version']}"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${dependencyManagement.importedProperties['grpc.version']}"
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {
+                option 'jakarta_omit'
+                option '@generated=omit'
+            }
+        }
+    }
+}
