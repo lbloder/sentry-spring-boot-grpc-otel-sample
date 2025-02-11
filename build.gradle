@@ -29,9 +29,14 @@ dependencyManagement {
 
 dependencies {
     implementation 'org.springframework.grpc:spring-grpc-spring-boot-starter'
+
+//    The two dependencies below are needed if you want to run spring mvc at the same time as grpc
+//    This will also change the port of the grpc server to `server.port` instead of `grpc.server.port`
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'io.grpc:grpc-servlet-jakarta'
+
     implementation 'io.grpc:grpc-services'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.sentry:sentry:8.1.0")
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.grpc:spring-grpc-test'

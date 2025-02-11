@@ -8,8 +8,8 @@ $ ./gradlew runWithAgent
 
 Adapt `sentry.properties` to your needs.
 
-The server starts by default on port 9090. Test with [gRPCurl](https://github.com/fullstorydev/grpcurl):
+The server starts by default on port 8080. Test with [gRPCurl](https://github.com/fullstorydev/grpcurl):
 
 ```
-$ grpcurl -d '{"name":"Hi"}' -plaintext localhost:9090 Simple.SayHello
+$ grpcurl -d '{"name":"Hi"}' -plaintext localhost:8080 Simple.SayHello
 ```
