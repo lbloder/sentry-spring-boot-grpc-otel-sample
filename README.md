@@ -4,7 +4,7 @@ This project is a copy one of the samples from the [gRPC Spring Boot Starter](ht
 
 ```
 $ ./gradlew runWithAgent
-...
+```
 
 Adapt `sentry.properties` to your needs.
 
