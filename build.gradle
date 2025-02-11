@@ -52,18 +52,16 @@ tasks.register('runWithAgent', JavaExec){
 
     def agentJarPath = "sentry-opentelemetry-agent-8.1.0.jar"
 
-    def dsn = System.getenv("SENTRY_DSN") ?: "https://c75dccdece8c4f2b8ca8eea97269cdbd@o447951.ingest.us.sentry.io/4505289086795776"
+    def sentryProperties = System.getenv("SENTRY_PROPERTIES_FILE") ?: "sentry.properties"
 
-    def tracesSampleRate = System.getenv("SENTRY_TRACES_SAMPLE_RATE") ?: "1"
+    environment("SENTRY_PROPERTIES_FILE", sentryProperties)
+    environment("OTEL_TRACES_EXPORTER", "console")
+    environment("OTEL_METRICS_EXPORTER", "console")
+    environment("OTEL_LOGS_EXPORTER", "console")
 
-    environment("SENTRY_DSN", dsn)
-    environment("SENTRY_TRACES_SAMPLE_RATE", tracesSampleRate)
-    environment("SENTRY_DEBUG", "true")
-    environment("OTEL_TRACES_EXPORTER", "none")
-    environment("OTEL_METRICS_EXPORTER", "none")
-    environment("OTEL_LOGS_EXPORTER", "none")
+    def otelDebug = System.getenv("OTEL_DEBUG") ?: "true"
 
-    jvmArgs = ["-Dotel.javaagent.debug=true", "-javaagent:${agentJarPath}".toString()]
+    jvmArgs = ["-Dotel.javaagent.debug=${otelDebug}", "-javaagent:${agentJarPath}".toString()]
 }
 
 protobuf {
